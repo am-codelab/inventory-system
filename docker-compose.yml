@@ -1,0 +1,59 @@
+services:
+  php:
+    build:
+      context: .
+      dockerfile: docker/php/Dockerfile
+    container_name: inventory_php
+    restart: unless-stopped
+    ports:
+      - "8000:80"
+    volumes:
+      - ./backend:/var/www/html
+    environment:
+      TZ: America/Guayaquil
+    depends_on:
+      - mysql
+    networks:
+      - inventory_network
+    stdin_open: true
+    tty: true
+
+  mysql:
+    image: mysql:8.4
+    container_name: inventory_mysql
+    restart: unless-stopped
+    
+    environment:
+      TZ: America/Guayaquil
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: inventory_db
+      MYSQL_USER: mateo
+      MYSQL_PASSWORD: 123
+    command: --default-time-zone='-05:00'
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - inventory_network
+
+  phpmyadmin:
+    image: phpmyadmin:latest
+    container_name: inventory_phpmyadmin
+    restart: unless-stopped
+    depends_on:
+      - mysql
+    ports:
+      - "8081:80"
+    environment:
+      PMA_HOST: mysql
+      PMA_PORT: 3306
+      PMA_USER: root
+      PMA_PASSWORD: root
+    networks:
+      - inventory_network
+
+volumes:
+  mysql_data:
+
+networks:
+  inventory_network:
+    driver: bridge
