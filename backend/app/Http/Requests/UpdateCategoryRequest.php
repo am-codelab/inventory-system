@@ -1,0 +1,58 @@
+<?php
+
+namespace App\Http\Requests;
+
+use Illuminate\Contracts\Validation\ValidationRule;
+use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
+use Illuminate\Support\Str;
+
+class UpdateCategoryRequest extends FormRequest
+{
+    /**
+     * Determine if the user is authorized to make this request.
+     */
+    public function authorize(): bool
+    {
+        return true;
+    }
+
+    /**
+     * Get the validation rules that apply to the request.
+     *
+     * @return array<string, ValidationRule|array<mixed>|string>
+     */
+    public function rules(): array
+    {
+        $category = $this->route('category');
+
+        return [
+
+            'name' => [
+                'required',
+                'string',
+                'max:100',
+                Rule::unique('categories', 'name')->ignore($category),//ignore hace que no se valide el nombre de la categoría actual, permitiendo que se mantenga el mismo nombre si no se cambia
+            ],
+
+            'description' => [
+                'nullable',
+                'string',
+            ],
+
+            'is_active' => [
+                'boolean',
+            ],
+        ];
+    }
+
+    protected function prepareForValidation(): void
+    {
+        if ($this->filled('name')) {
+
+            $this->merge([
+                'slug' => Str::slug($this->name),
+            ]);
+        }
+    }
+}
