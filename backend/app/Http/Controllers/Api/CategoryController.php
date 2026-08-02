@@ -4,9 +4,9 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Category;
-use Illuminate\Http\Request;
-use App\Http\Requests\StoreCategoryRequest;
-use App\Http\Requests\UpdateCategoryRequest;
+use App\Http\Requests\Category\IndexCategoryRequest;
+use App\Http\Requests\Category\StoreCategoryRequest;
+use App\Http\Requests\Category\UpdateCategoryRequest;
 use App\Http\Resources\CategoryResource;
 use Illuminate\Http\Response;
 
@@ -15,6 +15,7 @@ class CategoryController extends Controller
     /*
         Muestra una lista de categorías con paginación y ordenadas por nombre. Devuelve una colección de recursos de categoría.
     */
+    /*
     public function index()
     {
         $categories = Category::query()
@@ -31,7 +32,25 @@ class CategoryController extends Controller
 
         return CategoryResource::collection($categories);
     }
+    */
+    public function index(IndexCategoryRequest $request)
+    {
+        $filters = $request->validated();
 
+        $categories = Category::query()
+            ->search($filters['search'] ?? null)
+            ->active($filters['active'] ?? null)
+            ->sort(
+                $filters['sort'] ?? 'name',
+                $filters['direction'] ?? 'asc'
+            )
+            ->paginate(
+                $filters['per_page'] ?? 10
+            )
+            ->withQueryString();
+
+        return CategoryResource::collection($categories);
+    }
     // Crear una nueva categoría en la base de datos
     public function store(StoreCategoryRequest $request)
     {

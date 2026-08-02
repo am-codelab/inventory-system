@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Builder;
+use illuminate\Support\Str;
 
 class Category extends Model
 {
@@ -63,5 +64,19 @@ class Category extends Model
         }
 
         return $query->orderBy($sort, $direction);
+    }
+
+    // se ejecuta cuando se crea o se actualiza una categoría
+    protected static function booted(): void
+    {
+        static::creating(function (Category $category) {
+
+            $category->slug = Str::slug($category->name);
+        });
+
+        static::updating(function (Category $category) {
+
+            $category->slug = Str::slug($category->name);
+        });
     }
 }

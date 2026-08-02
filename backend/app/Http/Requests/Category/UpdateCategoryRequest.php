@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Http\Requests;
+namespace App\Http\Requests\Category;
 
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Str;
 
-class StoreCategoryRequest extends FormRequest
+class UpdateCategoryRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,30 +24,26 @@ class StoreCategoryRequest extends FormRequest
      */
     public function rules(): array
     {
+        $category = $this->route('category');
+
         return [
+
             'name' => [
                 'required',
                 'string',
                 'max:100',
-                'unique:categories,name,'
+                Rule::unique('categories', 'name')->ignore($category),//ignore hace que no se valide el nombre de la categoría actual, permitiendo que se mantenga el mismo nombre si no se cambia
             ],
+
             'description' => [
                 'nullable',
                 'string',
             ],
+
             'is_active' => [
                 'boolean',
             ],
         ];
     }
 
-    // Prepara la validación para el slug y lo genera a partir del nombre si no se proporciona
-    protected function prepareForValidation(): void
-    {
-        if (!$this->has('slug') && $this->filled('name')) {
-            $this->merge([
-                'slug' => Str::slug($this->name),
-            ]);
-        }
-    }
 }
