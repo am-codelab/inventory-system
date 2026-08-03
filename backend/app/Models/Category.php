@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Builder;
 use illuminate\Support\Str;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Category extends Model
 {
@@ -78,5 +79,10 @@ class Category extends Model
 
             $category->slug = Str::slug($category->name);
         });
+    }
+    // Relaciones para obtener los productos asociados a una categoría
+    public function products(): HasMany
+    {
+        return $this->hasMany(Product::class);
     }
 }
