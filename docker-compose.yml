@@ -34,6 +34,8 @@ services:
       - mysql_data:/var/lib/mysql
     networks:
       - inventory_network
+    ports:
+      - "3306:3306"
 
   phpmyadmin:
     image: phpmyadmin:latest
@@ -50,6 +52,7 @@ services:
       PMA_PASSWORD: root
     networks:
       - inventory_network
+
 
 volumes:
   mysql_data:
